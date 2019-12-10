@@ -2,5 +2,12 @@
     <string name="app_name">MatchWin</string>
 
     <!-- TODO: Remove or change this placeholder text -->
+    <string name="profile_picture">Profile Picture</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="currentuserspp">currentUsersPP</string>
+    <string name="textview">TextView</string>
+    <string name="play">PLAY</string>
+    <string name="leaders">LEADERS</string>
 </resources>
