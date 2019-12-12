@@ -12,6 +12,7 @@ import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_game.*
 import kotlinx.android.synthetic.main.fragment_game.view.*
 
@@ -34,11 +35,19 @@ class Game : Fragment() {
         val currentUser = auth.currentUser
         val postListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                // Get Post object and use the values to update the UI
-                val user = dataSnapshot.getValue(User::class.java)
-                view.score.text =  "Score: ".plus(user?.score.toString())
-                view.username.text = "Nickname: ".plus(currentUser?.email!!.split("@")[0])
-                view.highscore.text =  "Highscore: ".plus(user?.highscore.toString())
+                for (snapshot in dataSnapshot.children) {
+                    if (snapshot.child("nickname").value == currentUser?.email!!.split("@")[0]){
+                        val user = snapshot.getValue(User::class.java)
+                        view.score.text =  "Score: ".plus(user?.score.toString())
+                        view.username.text = "Nickname: ".plus(currentUser?.email!!.split("@")[0])
+                        view.highscore.text =  "Highscore: ".plus(user?.highscore.toString())
+                        Picasso.get().load(user?.avatar).into(view.imageView3)
+                        view.progressBar.visibility = View.INVISIBLE
+                        view.playbutton.visibility = View.VISIBLE
+                        view.leadersbutton.visibility = View.VISIBLE
+                        break
+                    }
+                }
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
@@ -63,7 +72,7 @@ class Game : Fragment() {
 
     private fun playClicked(){
         activity!!.supportFragmentManager.beginTransaction()
-            .replace(R.id.root_layout, Play())
+            .replace(R.id.root_layout, Level1())
             .addToBackStack(tag)
             .commit()
     }

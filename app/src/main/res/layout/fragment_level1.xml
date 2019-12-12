@@ -5,57 +5,54 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#CAEEE5"
-    tools:context=".Leaders">
-
+    tools:context=".Level1">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/leaderConstraintLayout"
+        android:id="@+id/inner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#F00606"
-        android:paddingLeft="16dp"
-        android:paddingTop="10dp"
-        android:paddingRight="16dp"
-        android:paddingBottom="10dp"
+        android:paddingBottom="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <Button
-            android:id="@+id/leaderBackBtn"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:background="@drawable/back"
-            app:layout_constraintStart_toStartOf="parent"
+        <TextView
+            android:id="@+id/scoreText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:text="@string/score_0"
+            android:textColor="#FFFFFF"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/timerText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
-            android:editable="false"
-            android:text="@string/leaders"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="10dp"
+            android:text="@string/time_03_00"
             android:textColor="#FFFFFF"
-            android:textSize="24sp"
-            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/leaderBackBtn"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/leaderRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="50dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:id="@+id/recyclerView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="32dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/leaderConstraintLayout"
-        tools:listitem="@layout/user_card" />
+        app:layout_constraintTop_toBottomOf="@+id/inner"
+        tools:listitem="@layout/memory_card" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
