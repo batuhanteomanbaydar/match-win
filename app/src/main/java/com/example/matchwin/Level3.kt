@@ -137,7 +137,7 @@ class Level3 : Fragment() {
                                 card.set(selectedItem2,R.color.colorPrimaryDark)
                             }else{
                                 found = found + 1
-                                userScore = userScore + 20
+                                userScore = userScore + 30
                                 scoreText3.text = "Score: ".plus(userScore.toString())
                             }
                             selectedItem1 = -1
