@@ -1,19 +1,30 @@
 package com.example.matchwin
 
+
 import android.os.Bundle
 import android.os.CountDownTimer
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.fragment_level4.*
 import kotlinx.android.synthetic.main.fragment_level4.view.*
+import kotlin.collections.ArrayList
 
-class Level4 : Fragment() {
+class Level4: Fragment() {
+
+    companion object {
+
+        fun newInstance(): Level4 {
+            return Level4()
+        }
+    }
+
     private lateinit var gametimer: CountDownTimer
 
     private lateinit var auth: FirebaseAuth
@@ -22,14 +33,16 @@ class Level4 : Fragment() {
 
     private lateinit var database: DatabaseReference
 
+    private lateinit var recyclerView4: RecyclerView
+
     private var userScore: Int = 0
 
     var numOpen = 0
     var found = 0
     var selectedItem1 = -1;
     var selectedItem2 = -1;
-    val data = ArrayList<Int>()
-    val cards = ArrayList<Int>()
+    val data4 = ArrayList<Int>()
+    val cards4 = ArrayList<Int>()
     var timeleft: Long = 180000
 
     override fun onCreateView(
@@ -39,6 +52,9 @@ class Level4 : Fragment() {
     ): View? {
 
         val view: View = inflater.inflate(R.layout.fragment_level4, container, false)
+        var layoutManager = GridLayoutManager(activity, 4, GridLayoutManager.VERTICAL, true)
+        recyclerView4 = view.findViewById(R.id.recyclerView4)
+        recyclerView4.layoutManager = layoutManager
         var min = 3
         var second = 0
 
@@ -64,7 +80,7 @@ class Level4 : Fragment() {
                 }
             }
             override fun onFinish() {
-                if (found != 6){
+                if (found != 8){
                     activity!!.supportFragmentManager.beginTransaction()
                         .replace(R.id.root_layout, GameOver())
                         .commit()
@@ -72,47 +88,50 @@ class Level4 : Fragment() {
             }
         }
         gametimer.start()
-        return view
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
         fetchData()
+        return view
     }
 
 
     private fun fetchData(){
-        data.add(R.drawable.picture_1)
-        data.add(R.drawable.picture_2)
-        data.add(R.drawable.picture_3)
-        data.add(R.drawable.picture_4)
-        data.add(R.drawable.picture_5)
-        data.add(R.drawable.picture_6)
-        data.add(R.drawable.picture_1)
-        data.add(R.drawable.picture_2)
-        data.add(R.drawable.picture_3)
-        data.add(R.drawable.picture_4)
-        data.add(R.drawable.picture_5)
-        data.add(R.drawable.picture_6)
-        data.shuffle()
-        cards.add(R.color.colorPrimaryDark)
-        cards.add(R.color.colorPrimaryDark)
-        cards.add(R.color.colorPrimaryDark)
-        cards.add(R.color.colorPrimaryDark)
-        cards.add(R.color.colorPrimaryDark)
-        cards.add(R.color.colorPrimaryDark)
-        cards.add(R.color.colorPrimaryDark)
-        cards.add(R.color.colorPrimaryDark)
-        cards.add(R.color.colorPrimaryDark)
-        cards.add(R.color.colorPrimaryDark)
-        cards.add(R.color.colorPrimaryDark)
-        cards.add(R.color.colorPrimaryDark)
-        showCards(cards)
+        data4.add(R.drawable.picture_1)
+        data4.add(R.drawable.picture_2)
+        data4.add(R.drawable.picture_3)
+        data4.add(R.drawable.picture_4)
+        data4.add(R.drawable.picture_5)
+        data4.add(R.drawable.picture_6)
+        data4.add(R.drawable.picture_7)
+        data4.add(R.drawable.picture_8)
+        data4.add(R.drawable.picture_1)
+        data4.add(R.drawable.picture_2)
+        data4.add(R.drawable.picture_3)
+        data4.add(R.drawable.picture_4)
+        data4.add(R.drawable.picture_5)
+        data4.add(R.drawable.picture_6)
+        data4.add(R.drawable.picture_7)
+        data4.add(R.drawable.picture_8)
+        data4.shuffle()
+        cards4.add(R.color.colorPrimaryDark)
+        cards4.add(R.color.colorPrimaryDark)
+        cards4.add(R.color.colorPrimaryDark)
+        cards4.add(R.color.colorPrimaryDark)
+        cards4.add(R.color.colorPrimaryDark)
+        cards4.add(R.color.colorPrimaryDark)
+        cards4.add(R.color.colorPrimaryDark)
+        cards4.add(R.color.colorPrimaryDark)
+        cards4.add(R.color.colorPrimaryDark)
+        cards4.add(R.color.colorPrimaryDark)
+        cards4.add(R.color.colorPrimaryDark)
+        cards4.add(R.color.colorPrimaryDark)
+        cards4.add(R.color.colorPrimaryDark)
+        cards4.add(R.color.colorPrimaryDark)
+        cards4.add(R.color.colorPrimaryDark)
+        cards4.add(R.color.colorPrimaryDark)
+        showCards(cards4)
     }
 
     private fun showCards(card: ArrayList<Int>){
         var gameAdapter = GameAdapter(card)
-        recyclerView4.layoutManager = GridLayoutManager(activity, 4, GridLayoutManager.VERTICAL, true)
         recyclerView4.adapter = gameAdapter
 
         gameAdapter.onItemClick = { item ->
@@ -122,7 +141,7 @@ class Level4 : Fragment() {
             }else{
                 selectedItem2 = item
             }
-            card.set(item,data.get(item))
+            card.set(item,data4.get(item))
             gameAdapter.notifyItemChanged(item)
             if (numOpen == 2){
                 if (selectedItem1 != selectedItem2) {
@@ -144,7 +163,7 @@ class Level4 : Fragment() {
                             selectedItem2 = -1
                             numOpen = 0
                             gameAdapter.notifyDataSetChanged();
-                            if (found == 6){
+                            if (found == 8){
                                 //gametimer.cancel()
                                 userScore = (userScore + (3*timeleft/1000)).toInt()
                                 scoreText4.text = "Score: ".plus(userScore.toString())
@@ -162,7 +181,15 @@ class Level4 : Fragment() {
                                                     if (userScore > highscore){
                                                         database.child(userId!!).child("highscore").setValue(userScore)
                                                     }
-                                                    updateUI()
+                                                    if (activity != null) {
+                                                        // 2
+                                                        activity!!.supportFragmentManager.beginTransaction()
+                                                            .remove(this@Level4)
+                                                            // 4
+                                                            .add(R.id.root_layout, Finish.newInstance(), "finish")
+                                                            // 5
+                                                            .commit()
+                                                    }
                                                 }
                                             }
                                         }
@@ -184,9 +211,5 @@ class Level4 : Fragment() {
         }
     }
 
-    private fun updateUI(){
-        if (activity != null){
-            activity!!.supportFragmentManager.beginTransaction().replace(R.id.root_layout,  Finish()).commit()
-        }
-    }
+
 }

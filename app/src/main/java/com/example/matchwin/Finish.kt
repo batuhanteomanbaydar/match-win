@@ -13,6 +13,14 @@ import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.fragment_finish.view.*
 
 class Finish : Fragment() {
+
+    companion object {
+
+        fun newInstance(): Finish {
+            return Finish()
+        }
+    }
+
     private lateinit var auth: FirebaseAuth
 
     private lateinit var user: FirebaseUser
@@ -29,6 +37,7 @@ class Finish : Fragment() {
         auth = FirebaseAuth.getInstance()
         user = auth.currentUser!!
         database = FirebaseDatabase.getInstance().getReference("users")
+
         val userListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 for (snapshot in dataSnapshot.children) {
@@ -37,6 +46,7 @@ class Finish : Fragment() {
                         val highscore = snapshot.child("highscore").value
                         view.goScore.text = "Score: ".plus(score.toString())
                         view.goHighscore.text = "Highscore: ".plus(highscore.toString())
+                        database.removeEventListener(this)
                         break
                     }
                 }

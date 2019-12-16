@@ -3,6 +3,7 @@ package com.example.matchwin
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -14,6 +15,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -34,6 +36,8 @@ class Signup : Fragment() {
 
     private  lateinit var storageRef: StorageReference
 
+    private lateinit var imageView: ImageView
+
     var avatarUrl: String = ""
 
     private lateinit var database: DatabaseReference
@@ -45,8 +49,15 @@ class Signup : Fragment() {
 
         val view: View = inflater!!.inflate(R.layout.fragment_signup, container, false)
 
+        imageView = view.findViewById(R.id.imageView)
+
         auth = FirebaseAuth.getInstance()
         storageRef = FirebaseStorage.getInstance().reference
+
+        avatarUrl = getArguments()?.getString("avatarUrl") ?: ""
+        if(avatarUrl.length > 0) {
+            imageView.setImageURI(Uri.parse(avatarUrl))
+        }
 
         view.select_image.setOnClickListener { view ->
             //pickImageFromGallery()
@@ -57,6 +68,10 @@ class Signup : Fragment() {
                 .setNegativeButton("Select Avatar", DialogInterface.OnClickListener {
                         dialog, id ->
                     dialog.dismiss()
+                    activity!!.supportFragmentManager.beginTransaction()
+                        .replace(R.id.root_layout, ChooseAvatar())
+                        .addToBackStack(tag)
+                        .commit()
                 })
                 .setPositiveButton("Open Gallery", DialogInterface.OnClickListener {
                         dialog, id ->
@@ -82,6 +97,16 @@ class Signup : Fragment() {
         }
         // Return the fragment view/layout
         return view
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (savedInstanceState != null){
+            avatarUrl = getArguments()?.getString("avatarUrl") ?: ""
+            if(avatarUrl.length > 0) {
+                imageView.setImageURI(Uri.parse(avatarUrl))
+            }
+        }
     }
 
     private fun pickImageFromGallery() {
@@ -176,9 +201,7 @@ class Signup : Fragment() {
                 if (task.isSuccessful) {
                     val downloadUri = task.result
                     avatarUrl = downloadUri.toString()
-                } else {
-                    // Handle failures
-                    // ...
+
                 }
             }
         }

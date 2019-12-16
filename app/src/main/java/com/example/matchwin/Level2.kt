@@ -1,15 +1,18 @@
 package com.example.matchwin
 
+
 import android.content.Context
+import android.nfc.Tag
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
@@ -19,6 +22,13 @@ import kotlin.collections.ArrayList
 
 class Level2 : Fragment() {
 
+    companion object {
+
+        fun newInstance(): Level2 {
+            return Level2()
+        }
+    }
+
     private lateinit var gametimer: CountDownTimer
 
     private lateinit var auth: FirebaseAuth
@@ -26,6 +36,8 @@ class Level2 : Fragment() {
     private lateinit var user: FirebaseUser
 
     private lateinit var database: DatabaseReference
+
+    private lateinit var recyclerView2: RecyclerView
 
     private var userScore: Int = 0
 
@@ -44,6 +56,9 @@ class Level2 : Fragment() {
     ): View? {
 
         val view: View = inflater.inflate(R.layout.fragment_level2, container, false)
+        var layoutManager = GridLayoutManager(activity, 4, GridLayoutManager.VERTICAL, true)
+        recyclerView2 = view.findViewById(R.id.recyclerView2)
+        recyclerView2.layoutManager = layoutManager
         var min = 3
         var second = 0
 
@@ -77,14 +92,13 @@ class Level2 : Fragment() {
             }
         }
         gametimer.start()
+        fetchData()
         return view
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        fetchData()
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
     }
-
 
     private fun fetchData(){
         data.add(R.drawable.picture_1)
@@ -109,7 +123,6 @@ class Level2 : Fragment() {
 
     private fun showCards(card: ArrayList<Int>){
         var gameAdapter = GameAdapter(card)
-        recyclerView2.layoutManager = GridLayoutManager(activity, 4, GridLayoutManager.VERTICAL, true)
         recyclerView2.adapter = gameAdapter
 
         gameAdapter.onItemClick = { item ->
@@ -156,11 +169,23 @@ class Level2 : Fragment() {
                                                 val highscore = snapshot.child("highscore").value.toString().toInt()
                                                 val score = snapshot.child("score").value.toString().toInt()
                                                 database.child(userId!!).child("score").setValue(userScore + score).addOnSuccessListener {
-                                                    if (userScore > highscore){
-                                                        database.child(userId!!).child("highscore").setValue(userScore)
+                                                    if (userScore > highscore) {
+                                                        database.child(userId!!).child("highscore")
+                                                            .setValue(userScore)
                                                     }
-                                                    updateUI()
                                                 }
+                                                if (activity != null) {
+                                                    activity!!.supportFragmentManager.beginTransaction()
+                                                        .replace(
+                                                            R.id.root_layout,
+                                                            Level3.newInstance(),
+                                                            "level3"
+                                                        )
+                                                        .commit()
+                                                }else{
+                                                    Log.w(tag,"null activity")
+                                                }
+                                                break
                                             }
                                         }
                                     }
@@ -181,10 +206,5 @@ class Level2 : Fragment() {
         }
     }
 
-    private fun updateUI(){
-        if (activity != null){
-            activity!!.supportFragmentManager.beginTransaction().replace(R.id.root_layout,  Level3()).commit()
-        }
-    }
 
 }

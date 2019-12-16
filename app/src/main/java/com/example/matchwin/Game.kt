@@ -72,14 +72,14 @@ class Game : Fragment() {
 
     private fun playClicked(){
         activity!!.supportFragmentManager.beginTransaction()
-            .replace(R.id.root_layout, Level1())
+            .add(R.id.root_layout, Level1.newInstance(), "level1")
             .addToBackStack(tag)
             .commit()
     }
 
     private fun leadersClicked(){
         activity!!.supportFragmentManager.beginTransaction()
-            .replace(R.id.root_layout, Leaders())
+            .replace(R.id.root_layout, Leaders(), "leaders")
             .addToBackStack(tag)
             .commit()
     }

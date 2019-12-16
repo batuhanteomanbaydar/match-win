@@ -7,11 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.fragment_leaders.*
 import kotlinx.android.synthetic.main.fragment_leaders.view.*
+import kotlinx.android.synthetic.main.fragment_level1.*
 import androidx.recyclerview.widget.DividerItemDecoration as DividerItemDecoration1
 
 
@@ -21,6 +23,7 @@ class Leaders : Fragment() {
     private lateinit var user: FirebaseUser
     private lateinit var database: DatabaseReference
 
+    private lateinit var leaderRecyclerView: RecyclerView
     val data = ArrayList<User>()
 
     override fun onCreateView(
@@ -35,17 +38,26 @@ class Leaders : Fragment() {
         user = auth.currentUser!!
         database = FirebaseDatabase.getInstance().getReference("users")
 
+        var layoutManager = LinearLayoutManager(activity)
+        leaderRecyclerView = view.leaderRecyclerView
+        leaderRecyclerView.layoutManager = layoutManager
+
+        val dividerItemDecoration = DividerItemDecoration1(
+            leaderRecyclerView.getContext(),
+            layoutManager.getOrientation()
+        )
+        leaderRecyclerView.addItemDecoration(dividerItemDecoration)
+
         view.leaderBackBtn.setOnClickListener(){ view ->
-            getFragmentManager()?.popBackStack()
+            getFragmentManager()!!.beginTransaction()
+                .replace(R.id.root_layout, Game())
+                .addToBackStack(tag)
+                .commit()
         }
 
-        return view
-    }
-
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
         fetchData()
+
+        return view
     }
 
     private fun fetchData(){
@@ -67,14 +79,7 @@ class Leaders : Fragment() {
 
     private fun showUsers(card: ArrayList<User>){
         var leaderAdapter = LeaderAdapter(card)
-        var layoutManager = LinearLayoutManager(activity)
-        leaderRecyclerView.layoutManager = layoutManager
         leaderRecyclerView.adapter = leaderAdapter
-        val dividerItemDecoration = DividerItemDecoration1(
-            leaderRecyclerView.getContext(),
-            layoutManager.getOrientation()
-        )
-        leaderRecyclerView.addItemDecoration(dividerItemDecoration)
     }
 
 }

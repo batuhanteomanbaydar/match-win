@@ -54,8 +54,7 @@ class Signin : Fragment() {
                         Log.d(ContentValues.TAG, "signInWithEmail:success")
                         val user = auth.currentUser
                         activity!!.supportFragmentManager.beginTransaction()
-                            .replace(R.id.root_layout, Game())
-                            .addToBackStack(tag)
+                            .replace(R.id.root_layout, Game(), "game")
                             .commit()
                     } else {
                         // If sign in fails, display a message to the user.

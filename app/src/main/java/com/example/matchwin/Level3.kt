@@ -2,18 +2,28 @@ package com.example.matchwin
 
 import android.os.Bundle
 import android.os.CountDownTimer
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.fragment_level3.*
 import kotlinx.android.synthetic.main.fragment_level3.view.*
 
+
 class Level3 : Fragment() {
+
+    companion object {
+
+        fun newInstance(): Level3 {
+            return Level3()
+        }
+    }
+
     private lateinit var gametimer: CountDownTimer
 
     private lateinit var auth: FirebaseAuth
@@ -21,6 +31,9 @@ class Level3 : Fragment() {
     private lateinit var user: FirebaseUser
 
     private lateinit var database: DatabaseReference
+
+    private lateinit var recyclerView3: RecyclerView
+
 
     private var userScore: Int = 0
 
@@ -38,13 +51,20 @@ class Level3 : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        val view: View = inflater.inflate(R.layout.fragment_level3, container, true)
+        val view: View = inflater.inflate(R.layout.fragment_level3, container, false)
+
+        var layoutManager = GridLayoutManager(activity, 4, GridLayoutManager.VERTICAL, true)
+        recyclerView3 = view.findViewById(R.id.recyclerView3)
+
+        recyclerView3.layoutManager = layoutManager
+        fetchData()
+
+
         var min = 3
         var second = 0
 
         auth = FirebaseAuth.getInstance()
         user = auth.currentUser!!
-
         view.timerText3.text = "Time: 0".plus(min.toString()).plus(".00")
         gametimer = object: CountDownTimer(180000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
@@ -75,12 +95,6 @@ class Level3 : Fragment() {
         return view
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        fetchData()
-    }
-
-
     private fun fetchData(){
         data.add(R.drawable.picture_1)
         data.add(R.drawable.picture_2)
@@ -110,32 +124,31 @@ class Level3 : Fragment() {
         showCards(cards)
     }
 
-    private fun showCards(card: ArrayList<Int>){
+    private fun showCards(card: ArrayList<Int>) {
         var gameAdapter = GameAdapter(card)
-        recyclerView3.layoutManager = GridLayoutManager(activity, 4, GridLayoutManager.VERTICAL, true)
         recyclerView3.adapter = gameAdapter
 
         gameAdapter.onItemClick = { item ->
             numOpen = numOpen + 1
-            if(numOpen == 1){
+            if (numOpen == 1) {
                 selectedItem1 = item
-            }else{
+            } else {
                 selectedItem2 = item
             }
-            card.set(item,data.get(item))
+            card.set(item, data.get(item))
             gameAdapter.notifyItemChanged(item)
-            if (numOpen == 2){
+            if (numOpen == 2) {
                 if (selectedItem1 != selectedItem2) {
-                    val timer = object: CountDownTimer(500, 1000) {
+                    val timer = object : CountDownTimer(500, 1000) {
                         override fun onTick(millisUntilFinished: Long) {
 
                         }
 
                         override fun onFinish() {
-                            if (card.get(selectedItem1) != card.get(selectedItem2)){
-                                card.set(selectedItem1,R.color.colorPrimaryDark)
-                                card.set(selectedItem2,R.color.colorPrimaryDark)
-                            }else{
+                            if (card.get(selectedItem1) != card.get(selectedItem2)) {
+                                card.set(selectedItem1, R.color.colorPrimaryDark)
+                                card.set(selectedItem2, R.color.colorPrimaryDark)
+                            } else {
                                 found = found + 1
                                 userScore = userScore + 30
                                 scoreText3.text = "Score: ".plus(userScore.toString())
@@ -144,9 +157,9 @@ class Level3 : Fragment() {
                             selectedItem2 = -1
                             numOpen = 0
                             gameAdapter.notifyDataSetChanged();
-                            if (found == 6){
+                            if (found == 6) {
                                 //gametimer.cancel()
-                                userScore = (userScore + (3*timeleft/1000)).toInt()
+                                userScore = (userScore + (3 * timeleft / 1000)).toInt()
                                 scoreText3.text = "Score: ".plus(userScore.toString())
 
                                 database = FirebaseDatabase.getInstance().getReference("users")
@@ -154,16 +167,38 @@ class Level3 : Fragment() {
                                 val userListener = object : ValueEventListener {
                                     override fun onDataChange(dataSnapshot: DataSnapshot) {
                                         for (snapshot in dataSnapshot.children) {
-                                            if (snapshot.child("nickname").value == user.email!!.split("@")[0]){
+                                            if (snapshot.child("nickname").value == user.email!!.split(
+                                                    "@"
+                                                )[0]
+                                            ) {
                                                 val userId = snapshot.key
-                                                val highscore = snapshot.child("highscore").value.toString().toInt()
-                                                val score = snapshot.child("score").value.toString().toInt()
-                                                database.child(userId!!).child("score").setValue(userScore + score).addOnSuccessListener {
-                                                    if (userScore > highscore){
-                                                        database.child(userId!!).child("highscore").setValue(userScore)
+                                                val highscore =
+                                                    snapshot.child("highscore").value.toString()
+                                                        .toInt()
+                                                val score =
+                                                    snapshot.child("score").value.toString().toInt()
+                                                database.child(userId!!).child("score")
+                                                    .setValue(userScore + score)
+                                                    .addOnSuccessListener {
+                                                        if (userScore > highscore) {
+                                                            database.child(userId!!)
+                                                                .child("highscore")
+                                                                .setValue(userScore)
+                                                        }
+                                                        if (activity != null) {
+                                                            // 2
+                                                            activity!!.supportFragmentManager.beginTransaction()
+                                                                // 4
+                                                                .remove(this@Level3)
+                                                                .add(
+                                                                    R.id.root_layout,
+                                                                    Level4.newInstance(),
+                                                                    "level4"
+                                                                )
+                                                                // 5
+                                                                .commit()
+                                                        }
                                                     }
-                                                    updateUI()
-                                                }
                                             }
                                         }
                                     }
@@ -176,17 +211,11 @@ class Level3 : Fragment() {
                         }
                     }
                     timer.start()
-                }else{
+                } else {
                     numOpen = 1
                     selectedItem2 = -1
                 }
             }
-        }
-    }
-
-    private fun updateUI(){
-        if (activity != null){
-            activity!!.supportFragmentManager.beginTransaction().replace(R.id.root_layout,  Level4()).commit()
         }
     }
 }
