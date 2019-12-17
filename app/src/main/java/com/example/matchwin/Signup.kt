@@ -24,6 +24,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.IgnoreExtraProperties
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_signup.*
 import kotlinx.android.synthetic.main.fragment_signup.view.*
 import java.io.File
@@ -56,7 +57,7 @@ class Signup : Fragment() {
 
         avatarUrl = getArguments()?.getString("avatarUrl") ?: ""
         if(avatarUrl.length > 0) {
-            imageView.setImageURI(Uri.parse(avatarUrl))
+            Picasso.get().load(avatarUrl).into(imageView)
         }
 
         view.select_image.setOnClickListener { view ->
@@ -201,6 +202,7 @@ class Signup : Fragment() {
                 if (task.isSuccessful) {
                     val downloadUri = task.result
                     avatarUrl = downloadUri.toString()
+                    Picasso.get().load(avatarUrl).into(imageView)
 
                 }
             }

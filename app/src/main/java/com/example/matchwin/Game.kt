@@ -56,7 +56,7 @@ class Game : Fragment() {
                 // ...
             }
         }
-        database.addValueEventListener(postListener)
+        database.addListenerForSingleValueEvent(postListener)
 
 
         view.playbutton.setOnClickListener {

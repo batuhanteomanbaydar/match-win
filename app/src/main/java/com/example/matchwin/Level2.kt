@@ -126,85 +126,105 @@ class Level2 : Fragment() {
         recyclerView2.adapter = gameAdapter
 
         gameAdapter.onItemClick = { item ->
-            numOpen = numOpen + 1
-            if(numOpen == 1){
-                selectedItem1 = item
-            }else{
-                selectedItem2 = item
-            }
-            card.set(item,data.get(item))
-            gameAdapter.notifyItemChanged(item)
-            if (numOpen == 2){
-                if (selectedItem1 != selectedItem2) {
-                    val timer = object: CountDownTimer(500, 1000) {
-                        override fun onTick(millisUntilFinished: Long) {
+            if (card.get(item) == R.color.colorPrimaryDark) {
+                numOpen = numOpen + 1
+                if (numOpen == 1) {
+                    selectedItem1 = item
+                } else {
+                    selectedItem2 = item
+                }
+                card.set(item, data.get(item))
+                gameAdapter.notifyItemChanged(item)
+                if (numOpen == 2) {
+                    if (selectedItem1 != selectedItem2) {
+                        val timer = object : CountDownTimer(500, 1000) {
+                            override fun onTick(millisUntilFinished: Long) {
 
-                        }
-
-                        override fun onFinish() {
-                            if (card.get(selectedItem1) != card.get(selectedItem2)){
-                                card.set(selectedItem1,R.color.colorPrimaryDark)
-                                card.set(selectedItem2,R.color.colorPrimaryDark)
-                            }else{
-                                found = found + 1
-                                userScore = userScore + 20
-                                scoreText2.text = "Score: ".plus(userScore.toString())
                             }
-                            selectedItem1 = -1
-                            selectedItem2 = -1
-                            numOpen = 0
-                            gameAdapter.notifyDataSetChanged();
-                            if (found == 4){
-                                //gametimer.cancel()
-                                userScore = (userScore + (3*timeleft/1000)).toInt()
-                                scoreText2.text = "Score: ".plus(userScore.toString())
 
-                                database = FirebaseDatabase.getInstance().getReference("users")
+                            override fun onFinish() {
+                                if (card.get(selectedItem1) != card.get(selectedItem2)) {
+                                    card.set(selectedItem1, R.color.colorPrimaryDark)
+                                    card.set(selectedItem2, R.color.colorPrimaryDark)
+                                } else {
+                                    found = found + 1
+                                    userScore = userScore + 20
+                                    scoreText2.text = "Score: ".plus(userScore.toString())
+                                }
+                                selectedItem1 = -1
+                                selectedItem2 = -1
+                                numOpen = 0
+                                gameAdapter.notifyDataSetChanged();
+                                if (found == 4) {
+                                    gametimer.cancel()
+                                    userScore = (userScore + (3 * timeleft / 1000)).toInt()
+                                    scoreText2.text = "Score: ".plus(userScore.toString())
+                                    //saveData()
+                                    database = FirebaseDatabase.getInstance().getReference("users")
 
-                                val userListener = object : ValueEventListener {
-                                    override fun onDataChange(dataSnapshot: DataSnapshot) {
-                                        for (snapshot in dataSnapshot.children) {
-                                            if (snapshot.child("nickname").value == user.email!!.split("@")[0]){
-                                                val userId = snapshot.key
-                                                val highscore = snapshot.child("highscore").value.toString().toInt()
-                                                val score = snapshot.child("score").value.toString().toInt()
-                                                database.child(userId!!).child("score").setValue(userScore + score).addOnSuccessListener {
-                                                    if (userScore > highscore) {
-                                                        database.child(userId!!).child("highscore")
-                                                            .setValue(userScore)
-                                                    }
+                                    val userListener = object : ValueEventListener {
+                                        override fun onDataChange(dataSnapshot: DataSnapshot) {
+                                            for (snapshot in dataSnapshot.children) {
+                                                if (snapshot.child("nickname").value == user.email!!.split(
+                                                        "@"
+                                                    )[0]
+                                                ) {
+
+                                                    val userId = snapshot.key
+                                                    val highscore =
+                                                        snapshot.child("highscore").value.toString()
+                                                            .toInt()
+                                                    val score =
+                                                        snapshot.child("score").value.toString()
+                                                            .toInt().plus(userScore)
+                                                    database.child(userId!!).child("score")
+                                                        .setValue(score).addOnCompleteListener {
+                                                            if (userScore > highscore) {
+                                                                database.child(userId!!).child("highscore")
+                                                                    .setValue(userScore)
+                                                                    .addOnCompleteListener {
+                                                                        updateUI()
+                                                                    }
+                                                            }
+                                                        }
+
+                                                    break
                                                 }
-                                                if (activity != null) {
-                                                    activity!!.supportFragmentManager.beginTransaction()
-                                                        .replace(
-                                                            R.id.root_layout,
-                                                            Level3.newInstance(),
-                                                            "level3"
-                                                        )
-                                                        .commit()
-                                                }else{
-                                                    Log.w(tag,"null activity")
-                                                }
-                                                break
                                             }
+                                            return
+                                        }
+
+                                        override fun onCancelled(databaseError: DatabaseError) {
                                         }
                                     }
+                                    database.addListenerForSingleValueEvent(userListener)
 
-                                    override fun onCancelled(databaseError: DatabaseError) {
-                                    }
                                 }
-                                database.addValueEventListener(userListener)
                             }
                         }
+                        timer.start()
+                    } else {
+                        numOpen = 1
+                        selectedItem2 = -1
                     }
-                    timer.start()
-                }else{
-                    numOpen = 1
-                    selectedItem2 = -1
                 }
             }
         }
     }
 
+    private fun updateUI(){
+        if (activity != null) {
+            Toast.makeText(context,"update",Toast.LENGTH_SHORT).show()
+            // 2
+            activity!!.supportFragmentManager.beginTransaction()
+                // 4
+                .replace(
+                    R.id.root_layout,
+                    Level3.newInstance(),
+                    "level3"
+                )
+                .commit()
+        }
+    }
 
 }
